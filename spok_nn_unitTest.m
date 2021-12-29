@@ -2,7 +2,7 @@
 
 % Sample used to run spok-nn and a Streaming DataSet
 % Author: David Nascimento Coelho
-% Last Update: 2020/10/20
+% Last Update: 2021/12/20
 
 close;          % Close all windows
 clear;          % Clear all variables
@@ -45,9 +45,9 @@ HP.gamma = 2;               % polynomial order (poly 2 or 3)
 
 HP_gs = HP;
 
-HP_gs.v1 = 1; % 2.^linspace(-4,3,8);
-HP_gs.v2 = HP_gs.v1(end) + 0.001;
-HP_gs.sigma = 0.0156; % 2.^linspace(-10,9,20);
+HP_gs.v1 = 0.125;                   % 2.^linspace(-4,3,8);
+HP_gs.v2 = HP_gs.v1(end) + 0.001;   % Don't need for ald
+HP_gs.sigma = 0.25;                 % 2.^linspace(-10,9,20);
 
 %% DATA LOADING AND PRE-PROCESSING
 
@@ -61,7 +61,7 @@ DATA = label_encode(DATA,OPT);      % adjust labels for the problem
 
 % Set data for the cross validation step: min (0.2 * N, 1000)
 
-if (N < 5000),
+if (N < 5000)
     Nhpo = floor(0.2 * N);
 else
     Nhpo = 1000;
@@ -115,7 +115,7 @@ VID = struct('cdata',cell(1,Nttt),'colormap', cell(1,Nttt));
 
 %% GRID SEARCH FOR HYPERPARAMETERS OPTIMIZATION
 
-display('begin grid search')
+disp('begin grid search')
 
 % Grid Search Parameters
 
@@ -125,19 +125,19 @@ GSp.lambda = 2; 	 % Jpbc = Ds + lambda * Err
 
 % Get Hyperparameters Optimized and the Prototypes Initialized
 
-PAR = grid_search_ttt(DATAhpo,HP_gs,@isknn_train,@isknn_classify,GSp);
+PAR = grid_search_ttt(DATAhpo,HP_gs,@spok_train,@spok_classify,GSp);
 
 %% PRESEQUENTIAL (TEST-THAN-TRAIN)
 
-display('begin Test-than-train')
+disp('begin Test-than-train')
 
 figure; % new figure for video ploting
 
-for n = 1:Nttt,
+for n = 1:Nttt
     
     % Display number of samples already seen (for debug)
     
-    if(mod(n,1000) == 0),
+    if(mod(n,1000) == 0)
         disp(n);
         disp(datestr(now));
     end
@@ -151,11 +151,11 @@ for n = 1:Nttt,
     % Test  (classify arriving data with current model)
     % Train (update model with arriving data)
     
-    PAR = isknn_train(DATAn,PAR);
+    PAR = spok_train(DATAn,PAR);
     
     % Hold Number of Samples per Class 
     
-    if n == 1,
+    if n == 1
         samples_per_class(y_lbl,n) = 1; % first element
     else
         samples_per_class(:,n) = samples_per_class(:,n-1);
@@ -169,14 +169,14 @@ for n = 1:Nttt,
     
     % Hold Number of Errors and Hits
     
-    if n == 1,
-        if (y_lbl == yh_lbl),
+    if n == 1
+        if (y_lbl == yh_lbl)
             no_of_correct(n) = 1;
         else
             no_of_errors(n) = 1;
         end
     else
-        if (y_lbl == yh_lbl),
+        if (y_lbl == yh_lbl)
             no_of_correct(n) = no_of_correct(n-1) + 1;
             no_of_errors(n) = no_of_errors(n-1);
         else
@@ -193,7 +193,7 @@ for n = 1:Nttt,
     % Hold Number of prototypes per Class
     
     [~,lbls] = max(PAR.Cy);
-    for c = 1:Nc,
+    for c = 1:Nc
         prot_per_class(c,n) = sum(lbls == c);
     end
     
@@ -225,7 +225,7 @@ hold off
 figure;
 colors = lines(Nc);
 hold on
-for c = 1:Nc,
+for c = 1:Nc
     plot(x,samples_per_class(c,:),'Color',colors(c,:));
 end
 title('Number of Samples Per Class')

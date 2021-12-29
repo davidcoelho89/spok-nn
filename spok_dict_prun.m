@@ -1,8 +1,8 @@
-function [PAR] = isk2nn_dict_prun(HP)
+function [PAR] = spok_dict_prun(HP)
 
-% --- Sparsification Procedure for Dictionary Pruning ---
+% --- Procedure for Dictionary Pruning ---
 %
-%   [PAR] = isk2nn_dict_prun(HP)
+%   [PAR] = spok_dict_prun(HP)
 %
 %   Input:
 %       HP.
@@ -48,28 +48,28 @@ score = HP.score;          	% Score of each prototype
 
 %% ALGORITHM
    
-if (Ps == 0),
+if (Ps == 0)
 
     % Does nothing
 
-elseif (Ps == 1 || Ps == 2),
+elseif (Ps == 1 || Ps == 2)
 
     [~,Dy_seq] = max(Dy);	% get sequential label of dictionary
 
-    for k = 1:m,
-        if (score(k) < min_score),
+    for k = 1:m
+        if (score(k) < min_score)
             
             % number of elements from the same class as the prototypes'
             c = Dy_seq(k);
             mc = sum(Dy_seq == c);
 
             % dont rem element if it is the only element of its class
-            if (mc == 1),
+            if (mc == 1)
                 continue;
             end
             
             % Remove Prototype from dictionary (just one per loop)
-            HP = isknn_rem_sample(HP,k);
+            HP = spok_rem_sample(HP,k);
             break;
         end
     end

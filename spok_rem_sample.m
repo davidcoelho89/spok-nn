@@ -1,8 +1,8 @@
-function [PAR] = isknn_rem_sample(HP,win)
+function [PAR] = spok_rem_sample(HP,win)
 
 % --- Remove a Sample from Dictionary and Update its Variables ---
 %
-%   [D] = isknn_rem_sample(DATA,HP,criterion_result)
+%   [D] = spok_rem_sample(DATA,HP,criterion_result)
 %
 %   Input:
 %       HP.
@@ -15,7 +15,7 @@ function [PAR] = isknn_rem_sample(HP,win)
 %           score = used for prunning method                    [1 x Nk]
 %           class_history = used for prunning method           	[1 x Nk]
 %           times_selected = used for prunning method           [1 x Nk]
-%           win = indicates which prototype should be removed 	[cte]
+%       win = indicates which prototype should be removed       [cte]
 %   Output: 
 %       PAR.
 %           Cx = Attributes of output dictionary                [p x Nk]
